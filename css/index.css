@@ -2835,6 +2835,7 @@ figure.highlight pre .javascript .function {
   color: #a9a9a9;
   font-style: italic;
   font-size: 140%;
+  display: none;
 }
 #aside-content #card-toc .toc-content {
   overflow-y: scroll;
