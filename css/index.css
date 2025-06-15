@@ -2002,39 +2002,6 @@ figure.highlight pre .javascript .function {
   margin: 6px 0;
   padding: 0.12em 0.4em 0.12em 1.4em;
 }
-.category_cloud_page {
-  display: -webkit-box;
-  display: -moz-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: box;
-  display: flex;
-  -webkit-box-lines: multiple;
-  -moz-box-lines: multiple;
-  -o-box-lines: multiple;
-  -webkit-flex-wrap: wrap;
-  -ms-flex-wrap: wrap;
-  flex-wrap: wrap;
-}
-.category_cloud_page a {
-  display: inline-block;
-  margin: 5px;
-  padding: 8px 15px;
-  background-color: var(--btn-bg);
-  color: var(--btn-color);
-  border-radius: 20px;
-  text-decoration: none;
-  -webkit-transition: all 0.3s ease;
-  -moz-transition: all 0.3s ease;
-  -o-transition: all 0.3s ease;
-  -ms-transition: all 0.3s ease;
-  transition: all 0.3s ease;
-}
-.category_cloud_page a:hover {
-  background-color: var(--btn-hover-color);
-  -webkit-box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-}
 #body-wrap {
   display: -webkit-box;
   display: -moz-box;
@@ -2552,39 +2519,6 @@ figure.highlight pre .javascript .function {
 }
 .page-title + .tag-cloud-list {
   text-align: left;
-}
-.tag_cloud_page {
-  display: -webkit-box;
-  display: -moz-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: box;
-  display: flex;
-  -webkit-box-lines: multiple;
-  -moz-box-lines: multiple;
-  -o-box-lines: multiple;
-  -webkit-flex-wrap: wrap;
-  -ms-flex-wrap: wrap;
-  flex-wrap: wrap;
-}
-.tag_cloud_page a {
-  display: inline-block;
-  margin: 5px;
-  padding: 8px 15px;
-  background-color: var(--btn-bg);
-  color: var(--btn-color);
-  border-radius: 20px;
-  text-decoration: none;
-  -webkit-transition: all 0.3s ease;
-  -moz-transition: all 0.3s ease;
-  -o-transition: all 0.3s ease;
-  -ms-transition: all 0.3s ease;
-  transition: all 0.3s ease;
-}
-.tag_cloud_page a:hover {
-  background-color: var(--btn-hover-color);
-  -webkit-box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 #aside-content {
   width: 26%;
