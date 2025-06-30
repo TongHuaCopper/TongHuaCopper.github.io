@@ -1,0 +1,308 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>山海自走棋开发介绍 | 铜华Copper个人博客</title><meta name="author" content="铜华Copper"><meta name="copyright" content="铜华Copper"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="山海自走棋：系统架构与核心模块全解 本文基于实际项目经验，系统梳理《山海自走棋》的整体架构、核心与主要功能模块，突出模块协作、技术实现与开发心得。  目录 项目简介 典型玩法流程 核心模块详解 地图生成模块 寻路模块 游戏时间轮战斗逻辑模块   其他功能模块详解 技术选型与开发心得 总结   项目简介《山海自走棋》是一款基于Unity开发的策略自走棋游戏，采用六边形网格地图，融合山海经神话与rog">
+<meta property="og:type" content="article">
+<meta property="og:title" content="山海自走棋开发介绍">
+<meta property="og:url" content="http://example.com/2024/05/01/%E5%B1%B1%E6%B5%B7%E8%87%AA%E8%B5%B0%E6%A3%8B%E5%8D%9A%E5%AE%A2%E4%BB%8B%E7%BB%8D/index.html">
+<meta property="og:site_name" content="铜华Copper个人博客">
+<meta property="og:description" content="山海自走棋：系统架构与核心模块全解 本文基于实际项目经验，系统梳理《山海自走棋》的整体架构、核心与主要功能模块，突出模块协作、技术实现与开发心得。  目录 项目简介 典型玩法流程 核心模块详解 地图生成模块 寻路模块 游戏时间轮战斗逻辑模块   其他功能模块详解 技术选型与开发心得 总结   项目简介《山海自走棋》是一款基于Unity开发的策略自走棋游戏，采用六边形网格地图，融合山海经神话与rog">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/%E5%B1%B1%E6%B5%B7%E8%87%AA%E8%B5%B0%E6%A3%8B%E5%8D%9A%E5%AE%A2%E4%BB%8B%E7%BB%8D/%E6%88%98%E6%96%97%E5%9B%BE%E7%89%87.png">
+<meta property="article:published_time" content="2024-05-01T12:00:00.000Z">
+<meta property="article:modified_time" content="2025-06-30T02:16:42.491Z">
+<meta property="article:author" content="铜华Copper">
+<meta property="article:tag" content="山海自走棋">
+<meta property="article:tag" content="Unity">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/%E5%B1%B1%E6%B5%B7%E8%87%AA%E8%B5%B0%E6%A3%8B%E5%8D%9A%E5%AE%A2%E4%BB%8B%E7%BB%8D/%E6%88%98%E6%96%97%E5%9B%BE%E7%89%87.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "山海自走棋开发介绍",
+  "url": "http://example.com/2024/05/01/%E5%B1%B1%E6%B5%B7%E8%87%AA%E8%B5%B0%E6%A3%8B%E5%8D%9A%E5%AE%A2%E4%BB%8B%E7%BB%8D/",
+  "image": "http://example.com/img/%E5%B1%B1%E6%B5%B7%E8%87%AA%E8%B5%B0%E6%A3%8B%E5%8D%9A%E5%AE%A2%E4%BB%8B%E7%BB%8D/%E6%88%98%E6%96%97%E5%9B%BE%E7%89%87.png",
+  "datePublished": "2024-05-01T12:00:00.000Z",
+  "dateModified": "2025-06-30T02:16:42.491Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "铜华Copper",
+      "url": "http://example.com/"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://example.com/2024/05/01/%E5%B1%B1%E6%B5%B7%E8%87%AA%E8%B5%B0%E6%A3%8B%E5%8D%9A%E5%AE%A2%E4%BB%8B%E7%BB%8D/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '山海自走棋开发介绍',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background-image: url(/img/garden.jpg);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/%E9%BB%98%E8%AE%A4%E5%A4%B4%E5%83%8F.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/山海自走棋博客介绍/战斗图片.png);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">首页</span></a><a class="nav-page-title" href="/"><span class="site-name">山海自走棋开发介绍</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">山海自走棋开发介绍</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-05-01T12:00:00.000Z" title="发表于 2024-05-01 20:00:00">2024-05-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-06-30T02:16:42.491Z" title="更新于 2025-06-30 10:16:42">2025-06-30</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%B8%B8%E6%88%8F%E5%BC%80%E5%8F%91/">游戏开发</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Unity/">Unity</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%8A%80%E6%9C%AF%E6%9E%B6%E6%9E%84/">技术架构</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h1 id="山海自走棋：系统架构与核心模块全解"><a href="#山海自走棋：系统架构与核心模块全解" class="headerlink" title="山海自走棋：系统架构与核心模块全解"></a>山海自走棋：系统架构与核心模块全解</h1><blockquote>
+<p>本文基于实际项目经验，系统梳理《山海自走棋》的整体架构、核心与主要功能模块，突出模块协作、技术实现与开发心得。</p>
+</blockquote>
+<h2 id="目录"><a href="#目录" class="headerlink" title="目录"></a>目录</h2><ul>
+<li><a href="#%E9%A1%B9%E7%9B%AE%E7%AE%80%E4%BB%8B">项目简介</a></li>
+<li><a href="#%E5%85%B8%E5%9E%8B%E7%8E%A9%E6%B3%95%E6%B5%81%E7%A8%8B">典型玩法流程</a></li>
+<li><a href="#%E6%A0%B8%E5%BF%83%E6%A8%A1%E5%9D%97%E8%AF%A6%E8%A7%A3">核心模块详解</a><ul>
+<li><a href="#%E5%9C%B0%E5%9B%BE%E7%94%9F%E6%88%90%E6%A8%A1%E5%9D%97">地图生成模块</a></li>
+<li><a href="#%E5%AF%BB%E8%B7%AF%E6%A8%A1%E5%9D%97">寻路模块</a></li>
+<li><a href="#%E6%B8%B8%E6%88%8F%E6%97%B6%E9%97%B4%E8%BD%AE%E6%88%98%E6%96%97%E9%80%BB%E8%BE%91%E6%A8%A1%E5%9D%97">游戏时间轮战斗逻辑模块</a></li>
+</ul>
+</li>
+<li><a href="#%E5%85%B6%E4%BB%96%E5%8A%9F%E8%83%BD%E6%A8%A1%E5%9D%97%E8%AF%A6%E8%A7%A3">其他功能模块详解</a></li>
+<li><a href="#%E6%8A%80%E6%9C%AF%E9%80%89%E5%9E%8B%E4%B8%8E%E5%BC%80%E5%8F%91%E5%BF%83%E5%BE%97">技术选型与开发心得</a></li>
+<li><a href="#%E6%80%BB%E7%BB%93">总结</a></li>
+</ul>
+<hr>
+<h2 id="项目简介"><a href="#项目简介" class="headerlink" title="项目简介"></a>项目简介</h2><p>《山海自走棋》是一款基于Unity开发的策略自走棋游戏，采用六边形网格地图，融合山海经神话与roguelike机制。项目架构高度模块化，便于功能扩展和维护。所有核心玩法与系统均以可扩展、可配置为目标设计，支持快速迭代和玩法创新。</p>
+<hr>
+<h2 id="典型玩法流程"><a href="#典型玩法流程" class="headerlink" title="典型玩法流程"></a>典型玩法流程</h2><ol>
+<li><strong>准备阶段</strong>：玩家可以布置棋子和建筑，调整装备和道具，所有操作仅在非战斗阶段进行。</li>
+<li><strong>战斗阶段</strong>：点击开始战斗后，所有单位会根据优先级依次自动行动，包括移动、攻击、施法等，敌人会按配置波次生成并自动寻路进攻。</li>
+<li><strong>结算与成长</strong>：战斗结束后结算奖励、掉落、羁绊等，进入下一阶段。奖励包括金币、经验、装备、遗物、道具等。</li>
+<li><strong>地图扩展</strong>：玩家可消耗金币主动扩展地图，解锁新地形和资源点。扩展时会自动检测新区域的布局合法性，防止与已有建筑、物体冲突。</li>
+<li><strong>装备与羁绊</strong>：棋子可拾取装备、遗物、道具，提升属性或获得特殊能力。装备分为普通和特殊类型，部分可叠加。遗物为全队生效的被动效果，道具可为消耗品或一次性增益。羁绊系统会根据上阵棋子的组合自动激活，实时反馈到UI。</li>
+<li><strong>棋子升级</strong>：场上和手牌中同类棋子达到三张时，自动合成为高星单位，升级过程支持装备继承和动画表现。</li>
+</ol>
+<p>【演示图&#x2F;视频&#x2F;动图展示】</p>
+<hr>
+<h2 id="核心模块详解"><a href="#核心模块详解" class="headerlink" title="核心模块详解"></a>核心模块详解</h2><h3 id="地图生成模块"><a href="#地图生成模块" class="headerlink" title="地图生成模块"></a>地图生成模块</h3><ul>
+<li>本项目采用中心对称的六边形网格地图，支持动态扩展。地图的每个格子都具备独立的地形类型、移动消耗、生成概率等属性，这些属性均可通过可视化配置灵活调整。</li>
+<li>地图生成时，系统会根据设定的半径和中心点自动生成所有格子，并为每个格子分配地形类型。地形的分布和移动权重直接影响后续的寻路和战斗。</li>
+<li>支持地图的动态扩展，玩家可消耗资源解锁新区域，系统会自动检测新区域的布局合法性，防止建筑、物体冲突。</li>
+<li>地图格子不仅承载单位，还能放置建筑和特殊物体，所有这些元素都与寻路、战斗、建筑系统深度协作。</li>
+<li>地图的核心数据结构为三维坐标系（q, r, s），便于六边形网格的定位和邻居查找。</li>
+<li>地图生成流程包括初始化参数、批量生成格子、分配地形、支持扩展和刷新。</li>
+</ul>
+<p>【演示图&#x2F;视频&#x2F;动图展示】</p>
+<hr>
+<h3 id="寻路模块"><a href="#寻路模块" class="headerlink" title="寻路模块"></a>寻路模块</h3><ul>
+<li>游戏采用A*算法实现六边形网格上的寻路，支持单位体积、地形移动消耗、障碍物判定等多种策略要素。每个单位在移动时会根据自身权重和地形消耗动态计算最优路径。</li>
+<li>为提升性能，寻路算法内部采用高效的堆结构管理开放列表，极大提升了大地图和多单位场景下的寻路效率。</li>
+<li>支持调试模式，开发阶段可高亮显示路径、起点、终点，便于分析AI行为和优化算法。</li>
+<li>寻路系统兼容多种单位类型，敌我双方可根据不同规则动态调整权重和可达性。例如，敌人可无视部分障碍，友方单位则需考虑建筑和队友的阻挡。</li>
+<li>寻路结果直接影响单位的AI决策和战斗行为，系统会根据当前地图状态和单位目标实时计算最优移动方案。</li>
+<li>典型流程包括节点初始化、邻居遍历、地形与权重判定、路径回溯、特殊情况处理（如不可达时自动寻找最近可达点）。</li>
+</ul>
+<p>【演示图&#x2F;视频&#x2F;动图展示】</p>
+<hr>
+<h3 id="游戏时间轮战斗逻辑模块"><a href="#游戏时间轮战斗逻辑模块" class="headerlink" title="游戏时间轮战斗逻辑模块"></a>游戏时间轮战斗逻辑模块</h3><ul>
+<li>战斗采用时间轮机制，所有单位的行动、技能、Buff&#x2F;Debuff等事件均以时间刻度为单位进行调度。每个单位或系统事件都注册为一个待触发的时间事件，按优先级和触发时刻统一管理。</li>
+<li>时间轮推进时，系统会依次执行所有到期事件，包括单位移动、攻击、技能释放、Buff结算等。事件调度高度解耦，便于扩展新类型的战斗行为。</li>
+<li>支持事件的动态插入、取消和优先级调整。例如，单位死亡时会自动注销相关事件，技能释放可临时插入高优先级事件。</li>
+<li>战斗流程与UI、羁绊、敌人生成等系统深度协作。比如，战斗动画、音效、UI提示均通过事件系统同步驱动。</li>
+<li>时间轮的核心数据结构为有序字典，按时间刻度存储所有待执行事件，支持高效的插入、查找和批量执行。</li>
+<li>典型流程包括事件注册、时间推进、事件批量执行、单位状态同步、事件注销。</li>
+</ul>
+<p>【演示图&#x2F;视频&#x2F;动图展示】</p>
+<hr>
+<h2 id="其他功能模块详解"><a href="#其他功能模块详解" class="headerlink" title="其他功能模块详解"></a>其他功能模块详解</h2><h3 id="敌人生成波次管理"><a href="#敌人生成波次管理" class="headerlink" title="敌人生成波次管理"></a>敌人生成波次管理</h3><ul>
+<li>敌人生成系统根据当前回合和波次配置，动态生成不同类型和数量的敌人。每一波敌人可配置生成时机、位置、类型、特殊能力等。</li>
+<li>敌人生成与时间轮事件联动，支持动态生成、重试、特殊事件（如Boss波、精英波等）。</li>
+<li>生成流程会自动检测目标区域的可用性，避免与玩家单位、建筑冲突。</li>
+<li>敌人生成后会自动注册到战斗系统，参与后续的AI决策和战斗。</li>
+</ul>
+<p>【演示图&#x2F;视频&#x2F;动图展示】</p>
+<hr>
+<h3 id="阶段回合与场景管理"><a href="#阶段回合与场景管理" class="headerlink" title="阶段回合与场景管理"></a>阶段回合与场景管理</h3><ul>
+<li>游戏阶段管理系统负责切换准备、战斗、回合选择、奖励等多种状态。每个阶段有独立的流程和UI表现。</li>
+<li>回合推进时，系统会根据当前阶段自动切换状态，触发相应的事件（如刷新商店、结算分数、发放奖励等）。</li>
+<li>支持无尽模式和特殊奖励回合，便于丰富玩法和提升可玩性。</li>
+<li>场景管理与UI、战斗、分数、存档等系统协作，保证状态切换的流畅和数据一致性。</li>
+</ul>
+<p>【演示图&#x2F;视频&#x2F;动图展示】</p>
+<hr>
+<h3 id="音频管理"><a href="#音频管理" class="headerlink" title="音频管理"></a>音频管理</h3><ul>
+<li>音频系统统一管理游戏内的背景音乐、战斗音乐、音效、UI提示音等。支持根据场景和战斗状态自动切换音乐。</li>
+<li>所有音效事件均可通过配置绑定到UI按钮、战斗事件、技能释放等，提升玩家沉浸感。</li>
+<li>支持音量调节、静音、淡入淡出等高级功能。</li>
+</ul>
+<p>【演示图&#x2F;视频&#x2F;动图展示】</p>
+<hr>
+<h3 id="羁绊与事件管理"><a href="#羁绊与事件管理" class="headerlink" title="羁绊与事件管理"></a>羁绊与事件管理</h3><ul>
+<li>羁绊系统自动统计玩家当前上阵棋子的组合，激活相应的羁绊效果。每种羁绊可配置多级效果和特殊触发条件。</li>
+<li>支持棋子间的事件联动，如特定组合可触发额外技能、属性加成、特殊动画等。</li>
+<li>羁绊效果会实时反馈到UI，便于玩家策略调整。</li>
+<li>支持动态事件系统，棋子、装备、遗物等均可触发全局或局部事件。</li>
+</ul>
+<p>【演示图&#x2F;视频&#x2F;动图展示】</p>
+<hr>
+<h3 id="建筑与物体布局模块"><a href="#建筑与物体布局模块" class="headerlink" title="建筑与物体布局模块"></a>建筑与物体布局模块</h3><ul>
+<li>建筑和物体布局系统支持多种类型的建筑、陷阱、障碍等元素的放置。每种建筑&#x2F;物体可配置独立的效果、范围、冲突规则。</li>
+<li>系统会自动检测布局的合法性，防止重叠、冲突和不合理放置。</li>
+<li>建筑和物体可影响周围单位的属性、战斗行为，支持动态生成和销毁。</li>
+</ul>
+<p>【演示图&#x2F;视频&#x2F;动图展示】</p>
+<hr>
+<h3 id="遗物-装备-道具管理"><a href="#遗物-装备-道具管理" class="headerlink" title="遗物&#x2F;装备&#x2F;道具管理"></a>遗物&#x2F;装备&#x2F;道具管理</h3><ul>
+<li>装备系统支持棋子拾取、穿戴、卸下多种装备，装备分为普通和特殊类型，部分可叠加。装备可通过掉落、商店等方式获得，支持批量管理和自动排序。</li>
+<li>遗物为全队生效的被动效果，拾取后立即生效，部分遗物可通过奖励选择获得。</li>
+<li>道具系统支持消耗品、一次性增益、特殊事件触发等多种类型。道具可批量管理，支持自动排序和筛选。</li>
+<li>装备、遗物、道具的获取、掉落、升级与战斗、分数、羁绊等系统深度协作。</li>
+</ul>
+<p>【演示图&#x2F;视频&#x2F;动图展示】</p>
+<hr>
+<h3 id="棋子升级管理"><a href="#棋子升级管理" class="headerlink" title="棋子升级管理"></a>棋子升级管理</h3><ul>
+<li>棋子升级系统会自动检测场上和手牌中的同类棋子，满足三合一条件时自动合成高星单位。</li>
+<li>升级过程支持装备继承、动画表现和递归升级。</li>
+<li>升级后棋子的属性、技能、羁绊效果会同步提升。</li>
+</ul>
+<p>【演示图&#x2F;视频&#x2F;动图展示】</p>
+<hr>
+<h3 id="游戏分数统计"><a href="#游戏分数统计" class="headerlink" title="游戏分数统计"></a>游戏分数统计</h3><ul>
+<li>分数系统会综合统计玩家的经济、战斗表现、羁绊激活、装备收集等多维度数据。</li>
+<li>每回合、每阶段、全局均有独立分数结算，支持历史记录和排行榜展示。</li>
+<li>分数与奖励、成就、存档等系统联动，提升玩家目标感。</li>
+</ul>
+<p>【演示图&#x2F;视频&#x2F;动图展示】</p>
+<hr>
+<h3 id="游戏数据保存"><a href="#游戏数据保存" class="headerlink" title="游戏数据保存"></a>游戏数据保存</h3><ul>
+<li>存档系统支持自动和手动存档，所有关键数据（分数、装备、棋子、地图、设置等）均可加密保存。</li>
+<li>支持断点续玩、音量和设置保存、多存档切换。</li>
+<li>存档与UI、分数、奖励等系统协作，保证数据一致性和安全性。</li>
+</ul>
+<p>【演示图&#x2F;视频&#x2F;动图展示】</p>
+<hr>
+<h3 id="商店与用户交互"><a href="#商店与用户交互" class="headerlink" title="商店与用户交互"></a>商店与用户交互</h3><ul>
+<li>商店系统支持卡牌购买、刷新、锁定、手牌管理等多种交互方式。刷新和升级均消耗金币，升级可提升人口上限。</li>
+<li>支持快捷操作、动画反馈、批量购买和出售。出售卡牌可获得金币。</li>
+<li>商店与经济、分数、升级、羁绊等系统深度协作，提升策略空间和用户体验。</li>
+</ul>
+<p>【演示图&#x2F;视频&#x2F;动图展示】</p>
+<hr>
+<h2 id="技术选型与开发心得"><a href="#技术选型与开发心得" class="headerlink" title="技术选型与开发心得"></a>技术选型与开发心得</h2><ul>
+<li><strong>六边形网格与A*寻路</strong>：六边形网格适合策略游戏，移动方向自然，地形表现丰富。A*算法结合地形权重、障碍、单位体积，兼顾效率与策略性。</li>
+<li><strong>时间轮机制</strong>：相比传统回合&#x2F;帧驱动，能灵活调度大量异步事件，适合复杂战斗场景，支持优先级、动态插入&#x2F;取消。</li>
+<li><strong>数据驱动设计</strong>：大量采用可配置数据对象，便于策划配置、批量调整，减少硬编码，支持热更与版本管理。</li>
+<li><strong>UI与交互</strong>：采用Unity UI系统，配合事件驱动，支持自定义动画与反馈，商店、羁绊、装备等交互界面均可复用组件。</li>
+<li><strong>模块解耦与协作</strong>：各系统通过事件、接口、单例等方式解耦，便于独立开发与维护。</li>
+</ul>
+<hr>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>《山海自走棋》通过模块化设计，将寻路、时间轮战斗、地图生成等核心系统与功能模块解耦，极大提升了项目的可维护性与扩展性。系统架构清晰，数据驱动灵活，适合持续迭代和玩法创新。希望本文能为同类策略游戏开发者提供有价值的架构参考。</p>
+<blockquote>
+<p>本文持续更新，欢迎留言交流与指正！ </p>
+</blockquote>
+</article><div class="tag_share"><div class="post-share"><div class="social-share" data-image="/img/%E5%B1%B1%E6%B5%B7%E8%87%AA%E8%B5%B0%E6%A3%8B%E5%8D%9A%E5%AE%A2%E4%BB%8B%E7%BB%8D/%E6%88%98%E6%96%97%E5%9B%BE%E7%89%87.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2023/10/27/%E5%85%AD%E8%BE%B9%E5%BD%A2%E7%BD%91%E6%A0%BC%E8%87%AA%E8%B5%B0%E6%A3%8B%E6%B8%B8%E6%88%8F%E8%AE%BE%E8%AE%A1%E5%88%9D%E6%8E%A2/" title="六边形棋盘上的策略较量：我的自走棋游戏设计初探"><img class="cover" src="/img/game_view.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">六边形棋盘上的策略较量：我的自走棋游戏设计初探</div></div><div class="info-2"><div class="info-item-1">大家好！最近我正在着手开发一款全新的自走棋游戏，它将颠覆传统的方格棋盘，引入独特的六边形网格，为策略爱好者带来前所未有的深度体验。今天，我想和大家分享一下这款游戏的设计思路和一些核心玩法。 核心玩法：策略与运气的完美融合在这款自走棋游戏中，你将扮演一名指挥官，在动态变化的六边形战场上部署和强化你的棋子。每一回合都充满选择：是从卡牌商店中招募新单位，还是为现有单位升级，亦或是获取强大的遗物和装备？你的每一个决策都将影响战局的走向。 系统亮点抢先看：动态六边形网格战场*   **地形生成与扩展：** 游戏中的六边形棋盘并非一成不变。系统会根据配置生成多样的地形，例如草原、山地和水域。更令人兴奋的是，地图还能动态扩展！你可以在边缘区域探索，解锁新的地块，为你的战术部署提供更多可能性。 *   **战略性站位：** 六边形网格提供了更丰富的相邻关系，这意味着棋子之间的站位将变得尤为重要。如何利用地形高低和单位的攻击范围，形成完美的防御阵线或发动奇袭，将是你赢得胜利的关键。  深度棋子强化系统*   **羁绊系统：**...</div></div></div></a><a class="pagination-related" href="/2025/06/30/hello-world/" title="Hello World"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">Hello World</div></div><div class="info-2"><div class="info-item-1">Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick StartCreate a new post1$ hexo new &quot;My New Post&quot;  More info: Writing Run server1$ hexo server  More info: Server Generate static files1$ hexo generate  More info: Generating Deploy to remote sites1$ hexo deploy  More info: Deployment </div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/%E9%BB%98%E8%AE%A4%E5%A4%B4%E5%83%8F.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">铜华Copper</div><div class="author-info-description"></div><!-- .site-data--><!--   a(href=url_for(config.archive_dir) + '/')--><!--     .headline= _p('aside.articles')--><!--     .length-num= site.posts.length--><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/TongHuaCopper"><i class="fab fa-github"></i><span>Github &gt;</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">本人求职中</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%B1%B1%E6%B5%B7%E8%87%AA%E8%B5%B0%E6%A3%8B%EF%BC%9A%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84%E4%B8%8E%E6%A0%B8%E5%BF%83%E6%A8%A1%E5%9D%97%E5%85%A8%E8%A7%A3"><span class="toc-number">1.</span> <span class="toc-text">山海自走棋：系统架构与核心模块全解</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%9B%AE%E5%BD%95"><span class="toc-number">1.1.</span> <span class="toc-text">目录</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A1%B9%E7%9B%AE%E7%AE%80%E4%BB%8B"><span class="toc-number">1.2.</span> <span class="toc-text">项目简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%B8%E5%9E%8B%E7%8E%A9%E6%B3%95%E6%B5%81%E7%A8%8B"><span class="toc-number">1.3.</span> <span class="toc-text">典型玩法流程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E6%A8%A1%E5%9D%97%E8%AF%A6%E8%A7%A3"><span class="toc-number">1.4.</span> <span class="toc-text">核心模块详解</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9C%B0%E5%9B%BE%E7%94%9F%E6%88%90%E6%A8%A1%E5%9D%97"><span class="toc-number">1.4.1.</span> <span class="toc-text">地图生成模块</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%BB%E8%B7%AF%E6%A8%A1%E5%9D%97"><span class="toc-number">1.4.2.</span> <span class="toc-text">寻路模块</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B8%B8%E6%88%8F%E6%97%B6%E9%97%B4%E8%BD%AE%E6%88%98%E6%96%97%E9%80%BB%E8%BE%91%E6%A8%A1%E5%9D%97"><span class="toc-number">1.4.3.</span> <span class="toc-text">游戏时间轮战斗逻辑模块</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%B6%E4%BB%96%E5%8A%9F%E8%83%BD%E6%A8%A1%E5%9D%97%E8%AF%A6%E8%A7%A3"><span class="toc-number">1.5.</span> <span class="toc-text">其他功能模块详解</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%95%8C%E4%BA%BA%E7%94%9F%E6%88%90%E6%B3%A2%E6%AC%A1%E7%AE%A1%E7%90%86"><span class="toc-number">1.5.1.</span> <span class="toc-text">敌人生成波次管理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%98%B6%E6%AE%B5%E5%9B%9E%E5%90%88%E4%B8%8E%E5%9C%BA%E6%99%AF%E7%AE%A1%E7%90%86"><span class="toc-number">1.5.2.</span> <span class="toc-text">阶段回合与场景管理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%9F%B3%E9%A2%91%E7%AE%A1%E7%90%86"><span class="toc-number">1.5.3.</span> <span class="toc-text">音频管理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BE%81%E7%BB%8A%E4%B8%8E%E4%BA%8B%E4%BB%B6%E7%AE%A1%E7%90%86"><span class="toc-number">1.5.4.</span> <span class="toc-text">羁绊与事件管理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BB%BA%E7%AD%91%E4%B8%8E%E7%89%A9%E4%BD%93%E5%B8%83%E5%B1%80%E6%A8%A1%E5%9D%97"><span class="toc-number">1.5.5.</span> <span class="toc-text">建筑与物体布局模块</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%81%97%E7%89%A9-%E8%A3%85%E5%A4%87-%E9%81%93%E5%85%B7%E7%AE%A1%E7%90%86"><span class="toc-number">1.5.6.</span> <span class="toc-text">遗物&#x2F;装备&#x2F;道具管理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A3%8B%E5%AD%90%E5%8D%87%E7%BA%A7%E7%AE%A1%E7%90%86"><span class="toc-number">1.5.7.</span> <span class="toc-text">棋子升级管理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B8%B8%E6%88%8F%E5%88%86%E6%95%B0%E7%BB%9F%E8%AE%A1"><span class="toc-number">1.5.8.</span> <span class="toc-text">游戏分数统计</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B8%B8%E6%88%8F%E6%95%B0%E6%8D%AE%E4%BF%9D%E5%AD%98"><span class="toc-number">1.5.9.</span> <span class="toc-text">游戏数据保存</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%95%86%E5%BA%97%E4%B8%8E%E7%94%A8%E6%88%B7%E4%BA%A4%E4%BA%92"><span class="toc-number">1.5.10.</span> <span class="toc-text">商店与用户交互</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8A%80%E6%9C%AF%E9%80%89%E5%9E%8B%E4%B8%8E%E5%BC%80%E5%8F%91%E5%BF%83%E5%BE%97"><span class="toc-number">1.6.</span> <span class="toc-text">技术选型与开发心得</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">1.7.</span> <span class="toc-text">总结</span></a></li></ol></li></ol></div></div><!-- !=partial('includes/widget/card_recent_post', {}, {cache: true})--></div></div></main><footer id="footer" style="background-image: url(/img/fishing.jpg);"><div id="footer-wrap"><div class="copyright">&copy;2025 By 铜华Copper</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.3.5</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
